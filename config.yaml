@@ -1,0 +1,152 @@
+df_id: DF-CAPE-CORAL-PHASE-MONITOR
+df_name: cape-coral-phase-monitor
+version: 1.0.0-PRODUCTION-BUILD
+status: PRE-PRODUCTION-CONDITIONAL
+crux-mk: true
+
+description: |
+  Monatliche Cape-Coral-Phase-Trigger-Detection per KLAUSEL-PATENT-WEGZUGS-CLAUSE
+  24M-Pre-Closing-Plan. Vier Tracker-Pillars:
+  - Patent-Aggregat-Bewertungs-Audit (drift-Detector vs §6 AStG-Wertgrenze)
+  - DBA-USA-DE-Update-Detector (Schritt-Aenderung)
+  - IRS-§482-Compliance-Tracker (Transfer-Pricing-Drift)
+  - Re-Migration-Trigger-Monitor (Phase-Wechsel-Triggers)
+  Bei Phase-Trigger: Pflicht-Phronesis-Alert an Martin (K_0-Sperr-Liste P6 Item-3).
+
+# === Default-Action (per ausreden-schutz.md Schicht 2, Welle-47 Migration Batch-1) ===
+# K_0-DIRECT: Cape-Coral-Pacing K_0-Sperr-Item-3 + Wegzugssteuer-Mitigation
+default_action:
+  description: "Monatlich 1. 09:00: 4-Pillar-Monitoring (PatentAggregatAuditor + DBAUpdateDetector + IRS482ComplianceTracker + ReMigrationTriggerMonitor) + Pflicht-Phronesis-Alert an Martin bei Phase-Trigger"
+  rho_per_run_eur: 100
+  rho_validation_source: unvalidated
+  block_gates:
+    - gate_id: K13_PAV
+      block_reason: "K_0-Direct: Pre-Action-Verification Pflicht (env_tag=production Cape-Coral-K_0-Domain + mount_point branch-hub/cape-coral + state-only reversibility)"
+      false_block_cost_eur: 80
+      legitimate_block_condition: "wiki-vertrags-master nicht erreichbar ODER state-mismatch detected"
+    - gate_id: K14
+      block_reason: "K_0-Sperr-Liste P6 Item-3: Cape-Coral-Timing nur via Martin-Phronesis (override_complexity: requires_understanding)"
+      false_block_cost_eur: 200
+      legitimate_block_condition: "Phase-Trigger detected (Patent-Aggregat-Drift >Wertgrenze ODER DBA-Update ODER IRS§482-Drift) - PHRONESIS-Eskalation Martin Pflicht"
+    - gate_id: K11
+      block_reason: "Cascade-Isolation hard: skip-pillar-resume-naechster, kein Auto-Aktion, kein Write/Trigger ohne Phronesis"
+      false_block_cost_eur: 50
+      legitimate_block_condition: "2+ Pillars unreachable >120s - degradation-mode aktivieren"
+  graceful_degradation_path: "Standalone-Mode (1-2 verbliebene Pillars, 65% Capability) - reine Detection, kein Auto-Aktion-Trigger, alle Phase-Decisions weiter Martin-Phronesis-Pflicht"
+
+tier_2_check:
+  lambda_per_month_estimate: 1
+  narrow_scope: "4-Pillar-Monitoring + Phase-Trigger-Detection (24M-Pre-Closing-Plan)"
+  determinism: 0.94
+  rollback_seconds: 30
+  test_coverage_target: 0.92
+  k0_protected: true
+  q0_measurable: true
+  escalation_after_n_fails: 3
+  rho_budget_eur_day: 1
+  audit_trail: branch-hub/audit/df-cape-coral-phase-monitor.jsonl
+
+k11_cascade_containment:
+  cascade_isolation: hard
+  failure_blast_radius: 1
+  dependency_dlq_strategy: "skip-pillar-resume-naechster + jsonl-log"
+
+k12_distillation_resistenz:
+  output_feeds_into_training: false
+  provenance_required_in_output: true
+  non_llm_validation_layer: "Aggregat-Wert-Math + DBA-Datums-Sanity (kein LLM-Judgment)"
+
+k13_independent_ground_truth:
+  external_anchor_type: github_api  # bundesfinanzhof-archive + IRS-mirror
+  external_anchor_validation_frequency: "pro Pillar pro Run"
+  pre_action_domain_check:
+    env_tag: "production (Cape-Coral-K_0-Domain)"
+    mount_point: "branch-hub/cape-coral/ + wiki-vertrags-master/ vorhanden"
+    network_region: "DE/EU + US (BMF + IRS)"
+  pre_action_backup_check:
+    backup_status: "monitor-state.json mit prev-pillar-werten (idempotent)"
+    replication_lag: "n/a"
+  pre_action_blast_radius_check:
+    blast_radius: "Pflicht-Phronesis-Alert (kein Auto-Aktion); state-only Storage"
+    reversibility_class: "state-only (pure-Detection, kein Write/Trigger ohne Phronesis)"
+
+k14_human_override_decay:
+  override_complexity: requires_understanding
+  override_documentation_freshness_days: 14
+  martin_review_cadence: "pro Phase-Trigger (Pflicht-Phronesis K_0-Sperr-Liste P6 Item-3)"
+  bus_factor_handover_drilled: false
+
+k15_entropy_budget:
+  entropy_added_loc_estimate: 250
+  entropy_added_concepts:
+    - PatentAggregatAuditor
+    - DBAUpdateDetector
+    - IRS482ComplianceTracker
+    - ReMigrationTriggerMonitor
+    - PhasePlanReader  # liest 24M-Pre-Closing-Plan
+  entropy_justified_by_rho: "8x+ (Wegzugssteuer-Mitigation EUR 500k-2M Substanzverzehr)"
+  entropy_subtractive_potential: "ersetzt manuelle Pflicht-Quartal-Steueranwalts-Audits"
+
+k16_concurrent_spawn_mutex:
+  concurrent_spawn_protection: both
+  lock_dir: /tmp/df-cape-coral-phase-monitor.lock
+  lock_stale_age_h: 6
+  engine_pgrep_check: true
+  lock_release_on: EXIT_INT_TERM
+
+lose_coupling:
+  LC1_graceful_degradation:
+    degradation_modes:
+      - full
+      - degraded_irs
+      - degraded_dba
+      - degraded_patent_aggregat
+      - standalone
+    degradation_test_required: true
+
+  LC2_direct_mode:
+    direct_mode_available: true
+    direct_mode_capability: 0.65
+    direct_mode_trigger: "Mehr als 2 Pillars unreachable >120s"
+
+  LC3_circuit_breaker:
+    circuit_breaker_timeout_s: 120
+    circuit_breaker_open_threshold: 3
+    circuit_breaker_half_open_test_interval_s: 600
+
+  LC4_failure_isolation:
+    state_externalization: true
+    idempotent_operations: true
+    dependency_dlq_separate: true
+
+  LC5_health_check:
+    health_check_dependencies: []
+    health_check_degraded_score: 0.6
+    health_check_endpoint_or_file: /tmp/df-cape-coral-phase-monitor-health.json
+
+operations:
+  output_path: ~/Projects/dark-factories/df-cape-coral-phase-monitor/
+  source_root: "branch-hub/cape-coral/"
+  output_dir: "branch-hub/audit/cape-coral-phase/"
+  state_file: ~/.df-cape-coral-phase-monitor/state.json
+  jsonl_audit_path: branch-hub/audit/df-cape-coral-phase-monitor.jsonl
+  stop_flag_path: /tmp/df-cape-coral-phase-monitor.stop
+  health_file_path: /tmp/df-cape-coral-phase-monitor-health.json
+  schedule: "Monatlich 1. 09:00"
+  pillars:
+    - patent_aggregat_audit
+    - dba_update_detector
+    - irs_482_compliance
+    - re_migration_trigger
+  k0_sperr_liste_item: 3  # K_0-Sperr-Liste P6 Item-3 Cape-Coral-Pacing
+
+rho_estimate:
+  annual_eur: 200000
+  reason: "Wegzugssteuer-Mitigation 500k-2M EUR Substanzverzehr; Pre-Closing-Plan 24M Pflicht-Pacing"
+  schwer_quantifizierbar: true
+
+crux_bindung:
+  K_0: "DIREKT GESCHUETZT (Wegzugssteuer §6 AStG; Cape-Coral-Pacing K_0-Sperr-Item-3)"
+  Q_0: "geschuetzt (Familien-Pacing-Stabilitaet bei Re-Migration)"
+  I_min: "strukturierte 4-Pillar-Pipeline (250 LOC + 12 Tests)"
+  W_0: "Steueranwalts-Bandbreite optimiert (Pflicht-Quartal-Audits ersetzt)"
