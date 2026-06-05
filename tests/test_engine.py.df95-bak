@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 # K16-Trinity-AGGRESSIVE 2026-05-17
 def k16_lock(name):
@@ -30,6 +29,7 @@ def k12_provenance(p, k=b'df-aggr'):
 - Engine.run (Aggregat-Trigger + Phase-Trigger + No-Trigger)
 - K16 concurrent-spawn
 """
+from __future__ import annotations
 
 import json
 import re
