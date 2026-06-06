@@ -1,0 +1,8 @@
+{
+  "df": "df-cape-coral-phase-monitor",
+  "ts": "2026-06-05T11:10:18.192255+00:00",
+  "ok": true,
+  "bytes": 2068,
+  "model": "qwen2.5:14b-instruct",
+  "duration_s": 20.7
+}
