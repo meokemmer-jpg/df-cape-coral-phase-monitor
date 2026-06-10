@@ -1,9 +1,9 @@
 {
   "df": "df-cape-coral-phase-monitor",
-  "ts": "2026-06-09T02:34:48.813919+00:00",
+  "ts": "2026-06-09T16:09:26.407059+00:00",
   "ok": true,
-  "bytes": 3970,
+  "bytes": 5134,
   "model": "kemmer-14b-ctx8k",
   "mode": "produce",
-  "duration_s": 33.2
+  "duration_s": 69.3
 }
