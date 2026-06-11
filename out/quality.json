@@ -1,9 +1,9 @@
 {
   "df": "df-cape-coral-phase-monitor",
-  "ts": "2026-06-10T11:11:58.364120+00:00",
+  "ts": "2026-06-11T02:10:09.645515+00:00",
   "maturity": "TESTED",
   "maturity_level": 4,
   "evidence_grade": 4,
-  "wargame_verdict": null,
+  "wargame_verdict": "CONDITIONAL",
   "crux": "[CRUX-MK]"
 }
