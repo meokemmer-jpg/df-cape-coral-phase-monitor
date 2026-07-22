@@ -4,6 +4,8 @@
 <dict>
 	<key>EnvironmentVariables</key>
 	<dict>
+		<key>DF_LLM_SENSITIV</key>
+		<string>true</string>
 		<key>HOME</key>
 		<string>/Users/make</string>
 		<key>PATH</key>
