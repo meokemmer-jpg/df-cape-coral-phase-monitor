@@ -6,6 +6,8 @@
 	<dict>
 		<key>DF_LLM_SENSITIV</key>
 		<string>true</string>
+		<key>DF_LLM_SENSITIV_MODE</key>
+		<string>local</string>
 		<key>HOME</key>
 		<string>/Users/make</string>
 		<key>PATH</key>
